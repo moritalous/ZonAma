@@ -1,5 +1,6 @@
 package forest.rice.field.k.zonama.ui;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,13 +8,14 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.ListFragment;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.provider.CalendarContract;
+import android.provider.CalendarContract.Events;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.ListView;
 import forest.rice.field.k.amazon.response.Item;
-import forest.rice.field.k.zonama.R;
 import forest.rice.field.k.zonama.async.ItemLookupAsyncTask;
 import forest.rice.field.k.zonama.async.ItemLookupAsyncTask.ItemLookupAsyncTaskCallBack;
 
@@ -36,6 +38,8 @@ public class ItemListFragment extends ListFragment implements ItemLookupAsyncTas
 	private String mParam2;
 
 	private OnFragmentInteractionListener mListener;
+	
+	List<Item> itemList = null; 
 
 	/**
 	 * Use this factory method to create a new instance of this fragment using
@@ -77,13 +81,6 @@ public class ItemListFragment extends ListFragment implements ItemLookupAsyncTas
 		asyncTask.execute(params);
 	}
 
-//	@Override
-//	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//			Bundle savedInstanceState) {
-//		// Inflate the layout for this fragment
-//		return inflater.inflate(R.layout.fragment_item_list, container, false);
-//	}
-
 	// TODO: Rename method, update argument and hook method into UI event
 	public void onButtonPressed(Uri uri) {
 		if (mListener != null) {
@@ -107,6 +104,31 @@ public class ItemListFragment extends ListFragment implements ItemLookupAsyncTas
 		super.onDetach();
 		mListener = null;
 	}
+	
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id) {
+		
+		Item item = itemList.get(position);
+		
+		String releaseDate = item.releaseDate;
+		
+		String year = releaseDate.substring(0, 4);
+		String month = releaseDate.substring(5, 7);
+		String day = releaseDate.substring(8, 10);
+		
+		Calendar beginTime = Calendar.getInstance();
+		beginTime.set(Integer.valueOf(year) , Integer.valueOf(month)-1, Integer.valueOf(day), 0, 0);
+		Calendar endTime = Calendar.getInstance();
+		endTime.set(Integer.valueOf(year) , Integer.valueOf(month)-1, Integer.valueOf(day), 0, 0);
+		Intent intent = new Intent(Intent.ACTION_INSERT)
+		        .setData(Events.CONTENT_URI)
+		        .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.getTimeInMillis())
+		        .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.getTimeInMillis())
+		        .putExtra(Events.TITLE, "【発売日】" + item.title);
+		        ;
+		startActivity(intent);
+		
+	}
 
 	/**
 	 * This interface must be implemented by activities that contain this
@@ -124,6 +146,8 @@ public class ItemListFragment extends ListFragment implements ItemLookupAsyncTas
 
 	@Override
 	public void itemLookupAsyncTaskCallBack(List<Item> result) {
+		itemList = result;
+		
 		ItemListAdapter adapter = new ItemListAdapter(getActivity(),result);
 		setListAdapter(adapter);
 		
