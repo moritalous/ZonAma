@@ -20,9 +20,7 @@ public class ItemLookupAsyncTask extends
 	@Override
 	protected List<Item> doInBackground(
 			@SuppressWarnings("unchecked") Map<String, String>... params) {
-
 		ItemLookupRequest request = new ItemLookupRequest();
-
 		return request.request(params[0]);
 	}
 

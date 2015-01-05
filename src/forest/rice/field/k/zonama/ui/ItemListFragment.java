@@ -5,16 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.ListFragment;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.SearchView;
 import forest.rice.field.k.amazon.response.Item;
 import forest.rice.field.k.zonama.async.ItemLookupAsyncTask;
 import forest.rice.field.k.zonama.async.ItemLookupAsyncTask.ItemLookupAsyncTaskCallBack;
@@ -27,7 +26,8 @@ import forest.rice.field.k.zonama.async.ItemLookupAsyncTask.ItemLookupAsyncTaskC
  * this fragment.
  *
  */
-public class ItemListFragment extends ListFragment implements ItemLookupAsyncTaskCallBack {
+public class ItemListFragment extends ListFragment implements
+		ItemLookupAsyncTaskCallBack {
 	// TODO: Rename parameter arguments, choose names that match
 	// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 	private static final String ARG_PARAM1 = "param1";
@@ -37,9 +37,9 @@ public class ItemListFragment extends ListFragment implements ItemLookupAsyncTas
 	private String mParam1;
 	private String mParam2;
 
-	private OnFragmentInteractionListener mListener;
-	
-	List<Item> itemList = null; 
+	List<Item> itemList = null;
+
+	SearchView searchView = null;
 
 	/**
 	 * Use this factory method to create a new instance of this fragment using
@@ -72,85 +72,51 @@ public class ItemListFragment extends ListFragment implements ItemLookupAsyncTas
 			mParam1 = getArguments().getString(ARG_PARAM1);
 			mParam2 = getArguments().getString(ARG_PARAM2);
 		}
-		
+
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("Keywords", "妖怪ウォッチ");
-		params.put("SearchIndex", "Toys");
+		params.put("Keywords", mParam1);
+		params.put("SearchIndex", "All");
 
 		ItemLookupAsyncTask asyncTask = new ItemLookupAsyncTask(this);
 		asyncTask.execute(params);
 	}
 
-	// TODO: Rename method, update argument and hook method into UI event
-	public void onButtonPressed(Uri uri) {
-		if (mListener != null) {
-			mListener.onFragmentInteraction(uri);
-		}
-	}
-
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		try {
-			mListener = (OnFragmentInteractionListener) activity;
-		} catch (ClassCastException e) {
-			throw new ClassCastException(activity.toString()
-					+ " must implement OnFragmentInteractionListener");
-		}
-	}
-
-	@Override
-	public void onDetach() {
-		super.onDetach();
-		mListener = null;
-	}
-	
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		
+
 		Item item = itemList.get(position);
-		
+
 		String releaseDate = item.releaseDate;
-		
+
 		String year = releaseDate.substring(0, 4);
 		String month = releaseDate.substring(5, 7);
 		String day = releaseDate.substring(8, 10);
-		
-		Calendar beginTime = Calendar.getInstance();
-		beginTime.set(Integer.valueOf(year) , Integer.valueOf(month)-1, Integer.valueOf(day), 0, 0);
-		Calendar endTime = Calendar.getInstance();
-		endTime.set(Integer.valueOf(year) , Integer.valueOf(month)-1, Integer.valueOf(day), 0, 0);
-		Intent intent = new Intent(Intent.ACTION_INSERT)
-		        .setData(Events.CONTENT_URI)
-		        .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.getTimeInMillis())
-		        .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.getTimeInMillis())
-		        .putExtra(Events.TITLE, "【発売日】" + item.title);
-		        ;
-		startActivity(intent);
-		
-	}
 
-	/**
-	 * This interface must be implemented by activities that contain this
-	 * fragment to allow an interaction in this fragment to be communicated to
-	 * the activity and potentially other fragments contained in that activity.
-	 * <p>
-	 * See the Android Training lesson <a href=
-	 * "http://developer.android.com/training/basics/fragments/communicating.html"
-	 * >Communicating with Other Fragments</a> for more information.
-	 */
-	public interface OnFragmentInteractionListener {
-		// TODO: Update argument type and name
-		public void onFragmentInteraction(Uri uri);
+		Calendar beginTime = Calendar.getInstance();
+		beginTime.set(Integer.valueOf(year), Integer.valueOf(month) - 1,
+				Integer.valueOf(day), 0, 0);
+		Calendar endTime = Calendar.getInstance();
+		endTime.set(Integer.valueOf(year), Integer.valueOf(month) - 1,
+				Integer.valueOf(day), 0, 0);
+		Intent intent = new Intent(Intent.ACTION_INSERT)
+				.setData(Events.CONTENT_URI)
+				.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME,
+						beginTime.getTimeInMillis())
+				.putExtra(CalendarContract.EXTRA_EVENT_END_TIME,
+						endTime.getTimeInMillis())
+				.putExtra(Events.TITLE, "【発売日】" + item.title);
+		;
+		startActivity(intent);
+
 	}
 
 	@Override
 	public void itemLookupAsyncTaskCallBack(List<Item> result) {
 		itemList = result;
-		
-		ItemListAdapter adapter = new ItemListAdapter(getActivity(),result);
-		setListAdapter(adapter);
-		
-	}
 
+		ItemListAdapter adapter = new ItemListAdapter(getActivity(), result);
+		setListAdapter(adapter);
+
+	}
 }

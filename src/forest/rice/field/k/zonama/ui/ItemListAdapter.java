@@ -2,6 +2,7 @@ package forest.rice.field.k.zonama.ui;
 
 import java.util.List;
 
+import LruCacheSample.VolleyLruCache;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,15 +10,26 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.ImageLoader.ImageListener;
+import com.android.volley.toolbox.Volley;
+
 import forest.rice.field.k.amazon.response.Item;
 import forest.rice.field.k.zonama.R;
-import forest.rice.field.k.zonama.async.ImageDownloadAsyncTask;
 
 public class ItemListAdapter extends ArrayAdapter<Item> {
 	private LayoutInflater layoutInflater_;
 
+	private ImageLoader mImageLoader;
+	private RequestQueue mQueue;
+
 	public ItemListAdapter(Context context, List<Item> objects) {
 		this(context, 0, 0, objects);
+
+		mQueue = Volley.newRequestQueue(getContext());
+		mImageLoader = new ImageLoader(mQueue, new VolleyLruCache());
 	}
 
 	private ItemListAdapter(Context context, int resource,
@@ -47,10 +59,13 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
 		}
 
 		Item item = getItem(position);
-		
-		ImageDownloadAsyncTask asyncTask = new ImageDownloadAsyncTask(holder.imageview);
-		asyncTask.execute(item.largeImage);
-		
+
+		ImageListener listener = ImageLoader
+				.getImageListener(holder.imageview,
+						R.drawable.ic_launcher /* 表示待ち時の画像 */,
+						R.drawable.ic_launcher /* エラー時の画像 */);
+		mImageLoader.get(item.largeImage, listener); /* URLから画像を取得する */
+
 		holder.name.setText(item.title);
 		holder.releaseDate.setText(item.releaseDate);
 
