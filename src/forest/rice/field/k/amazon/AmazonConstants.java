@@ -5,14 +5,14 @@ public class AmazonConstants {
 	/*
 	 * Your AWS Access Key ID, as taken from the AWS Your Account page.
 	 */
-	public static final String AWS_ACCESS_KEY_ID = "AKIAJW6C556DJX4LXH3A";
+	public static final String AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID";
 
 	/*
 	 * Your AWS Secret Key corresponding to the above ID, as taken from the AWS
 	 * Your Account page.
 	 */
-	public static final String AWS_SECRET_KEY = "CX4TFQhfJm0KjHxzuv7Zt3V7VCUD9ZbtrIsph0qS";
+	public static final String AWS_SECRET_KEY = "AWS_SECRET_KEY";
 
-	public static final String AWS_ASSOCIATE_TAG = "moritalous-22";
+	public static final String AWS_ASSOCIATE_TAG = "AWS_ASSOCIATE_TAG";
 
 }
