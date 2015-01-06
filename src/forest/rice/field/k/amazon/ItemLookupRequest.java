@@ -42,7 +42,6 @@ public class ItemLookupRequest {
 			helper = SignedRequestsHelper.getInstance(ENDPOINT,
 					AWS_ACCESS_KEY_ID, AWS_SECRET_KEY);
 		} catch (Exception e) {
-			e.printStackTrace();
 			return null;
 		}
 
@@ -62,13 +61,7 @@ public class ItemLookupRequest {
 				Item item = new Item(itemNodeList.item(i));
 				itemList.add(item);
 			}
-
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
 		}
 
 		return itemList;

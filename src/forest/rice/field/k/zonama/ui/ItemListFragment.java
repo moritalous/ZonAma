@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.SearchView;
 import forest.rice.field.k.amazon.response.Item;
+import forest.rice.field.k.amazon.response.Item.CalendarDataException;
 import forest.rice.field.k.zonama.async.ItemLookupAsyncTask;
 import forest.rice.field.k.zonama.async.ItemLookupAsyncTask.ItemLookupAsyncTaskCallBack;
 
@@ -62,7 +63,6 @@ public class ItemListFragment extends ListFragment implements
 	}
 
 	public ItemListFragment() {
-		// Required empty public constructor
 	}
 
 	@Override
@@ -74,7 +74,6 @@ public class ItemListFragment extends ListFragment implements
 		}
 
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("Keywords", "妖怪ウォッチ");
 		params.put("Keywords", mParam1);
 		params.put("SearchIndex", "All");
 
@@ -84,39 +83,17 @@ public class ItemListFragment extends ListFragment implements
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-
-		Item item = itemList.get(position);
-
-		String releaseDate = item.releaseDate;
-
-		String year = releaseDate.substring(0, 4);
-		String month = releaseDate.substring(5, 7);
-		String day = releaseDate.substring(8, 10);
-
-		Calendar beginTime = Calendar.getInstance();
-		beginTime.set(Integer.valueOf(year), Integer.valueOf(month) - 1,
-				Integer.valueOf(day), 0, 0);
-		Calendar endTime = Calendar.getInstance();
-		endTime.set(Integer.valueOf(year), Integer.valueOf(month) - 1,
-				Integer.valueOf(day), 0, 0);
-		Intent intent = new Intent(Intent.ACTION_INSERT)
-				.setData(Events.CONTENT_URI)
-				.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME,
-						beginTime.getTimeInMillis())
-				.putExtra(CalendarContract.EXTRA_EVENT_END_TIME,
-						endTime.getTimeInMillis())
-				.putExtra(Events.TITLE, "【発売日】" + item.title);
-		;
-		startActivity(intent);
-
+		try {
+			Item item = itemList.get(position);
+			startActivity(item.createCalendarIntent());
+		} catch (CalendarDataException e) {
+		}
 	}
 
 	@Override
 	public void itemLookupAsyncTaskCallBack(List<Item> result) {
 		itemList = result;
-
 		ItemListAdapter adapter = new ItemListAdapter(getActivity(), result);
 		setListAdapter(adapter);
-
 	}
 }

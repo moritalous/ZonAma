@@ -59,12 +59,13 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
 		}
 
 		Item item = getItem(position);
+		String image = item.mediumImage != null ? item.mediumImage : item.largeImage;
 
 		ImageListener listener = ImageLoader
 				.getImageListener(holder.imageview,
 						R.drawable.ic_launcher /* 表示待ち時の画像 */,
 						R.drawable.ic_launcher /* エラー時の画像 */);
-		mImageLoader.get(item.largeImage, listener); /* URLから画像を取得する */
+		mImageLoader.get(image, listener); /* URLから画像を取得する */
 
 		holder.name.setText(item.title);
 		holder.releaseDate.setText(item.releaseDate);
